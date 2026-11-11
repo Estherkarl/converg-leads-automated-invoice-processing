@@ -1,92 +1,57 @@
 # Automated Invoice Processing with n8n | ConvergLeads
 
-An automated invoice processing workflow built with n8n, designed to receive invoices, identify file formats, extract invoice information, validate data, request human approval, and simulate invoice submission to SAP.
+**AI Automation. One Platform. Endless Possibilities.**
 
 ## 🚀 Overview
 
-Invoice processing is an essential but often repetitive business activity.
+This project demonstrates an automated invoice processing workflow built with **n8n** under the ConvergLeads brand.
 
-Employees frequently spend time receiving invoices, opening documents, extracting information, checking amounts, and entering data into business systems.
+The solution automates several steps of invoice processing, from receiving an invoice file to extracting and validating invoice data, requesting human approval, and sending approved invoice data to a simulated SAP environment.
 
-This project demonstrates how workflow automation can simplify and improve this process.
+The goal is to reduce manual tasks, improve data consistency, and make invoice processing more efficient.
 
-With **ConvergLeads**, we designed an n8n workflow that automates several stages of invoice processing while keeping human approval as an important control point before the SAP submission stage.
+## 🎥 Demo Videos
 
-The solution supports multiple invoice file formats, including:
+Watch the project demonstrations on LinkedIn:
 
-- PDF
-- XLSX
-- XLS
-- CSV
-
-## 🎥 Project Demonstration
-
-Watch the complete workflow demonstration:
-
-- 🇬🇧 [English Demo](demo/invoice-automation-demo-en.mp4)
-- 🇩🇪 [German Demo](demo/invoice-automation-demo-de.mp4)
+- **English Demo:** [Watch the Automated Invoice Processing Demo](https://www.linkedin.com/posts/esther-madianga_n8n-workflowautomation-businessautomation-ugcPost-7526394549091516417-MOHn/)
+- **German Demo:** [Automatisierte Rechnungsverarbeitung ansehen](https://www.linkedin.com/posts/esther-madianga_n8n-workflowautomation-businessautomation-ugcPost-7526389925957574656-bMKs/)
 
 ## 🏗️ Workflow Architecture
 
+The workflow is designed to automate the invoice processing lifecycle through the following steps:
 
+1. Invoice file reception
+2. File type identification
+3. Routing based on file type
+4. Invoice data extraction
+5. Data normalization
+6. Invoice validation
+7. Excel review file generation
+8. Human approval
+9. Approval decision processing
+10. SAP sandbox submission simulation
+11. Rejection handling
 
-### Automation Flow
-
-Receive Invoice File
-↓
-Identify File Type
-↓
-Route by File Type
-↓
-Extract PDF / XLSX / XLS / CSV
-↓
-Normalize Invoice Fields
-↓
-Validate Invoice
-↓
-Prepare Excel Row
-↓
-Create Excel Review
-↓
-Human Approval
-↓
-Approval Decision
-↓
-SAP Sandbox Simulation
+![ConvergLeads Invoice Processing Workflow](workflow.png)
 
 ## ⚙️ How the Workflow Works
 
 ### 1. Receive Invoice File
 
-The process starts when an invoice file is received through an n8n Webhook.
-
-During development and testing, PowerShell is used to send the invoice file to the local webhook endpoint.
-
-The workflow receives the uploaded file and starts the automation process.
+The workflow receives an invoice file through an n8n webhook.
 
 ### 2. Identify File Type
 
-The workflow automatically identifies the format of the incoming file.
-
-It determines whether the document is a PDF, XLSX, XLS, or CSV file.
-
-This step is important because different file formats require different extraction methods.
+The system identifies the uploaded file format, such as PDF, XLSX, XLS, or CSV.
 
 ### 3. Route by File Type
 
-After identifying the file format, the workflow routes the document to the corresponding processing branch.
-
-Each supported file type follows its own extraction path.
-
-This makes the workflow flexible and easier to extend.
+The workflow automatically directs the invoice to the appropriate processing branch.
 
 ### 4. Extract Invoice Data
 
-The workflow uses dedicated extraction steps for the different file formats.
-
-The objective is to retrieve the available invoice information from each document.
-
-The extracted information can include:
+Relevant invoice information is extracted, including:
 
 - Supplier name
 - Invoice number
@@ -94,156 +59,112 @@ The extracted information can include:
 - Net amount
 - VAT amount
 - Gross amount
+- Currency
 
 ### 5. Normalize Invoice Fields
 
-Invoices may contain different labels and data structures.
+The extracted information is converted into a consistent data structure to simplify further processing.
 
-For example, one supplier may use "Invoice Number", while another uses "Rechnungsnummer".
+### 6. Validate Invoice Data
 
-The normalization step converts the extracted information into a consistent structure.
+The workflow checks whether required information is available and whether the invoice amounts are consistent.
 
-This allows the following workflow steps to process the invoice data in a standardized way.
+### 7. Create Excel Review
 
-### 6. Validate Invoice
+The extracted invoice information is prepared in an Excel review file for further verification.
 
-Before continuing, the workflow checks the extracted invoice information.
+### 8. Human Approval
 
-The validation process checks whether important fields are available.
+The workflow pauses and waits for a human decision before continuing.
 
-It also compares the financial amounts.
+### 9. Approval Decision
 
-For example:
+An IF condition checks the approval decision:
 
-Net Amount + VAT Amount = Gross Amount
+- **APPROVE:** The invoice continues to the SAP sandbox.
+- **REJECT:** The invoice follows the rejection branch.
 
-The workflow can identify missing information or differences between the invoice totals.
+### 10. SAP Sandbox Integration
 
-This helps detect potential errors before human approval.
+For this demonstration, the workflow sends the approved invoice data to a simulated SAP environment.
 
-### 7. Prepare Excel Row
+The sandbox returns a simulated response with a document reference. No invoice is posted to a live production SAP system.
 
-The extracted and validated invoice information is organized into a structured data row.
+### 11. Rejection Handling
 
-This prepares the information for the next processing steps and makes it easier to review.
-
-### 8. Create Excel Review
-
-The workflow creates an Excel review file containing the invoice information.
-
-This provides a structured overview of the extracted data and supports the human review process.
-
-### 9. Human Approval – Wait
-
-Human approval is an important part of the workflow.
-
-After preparing the invoice information, the workflow waits for an employee to review the data.
-
-The employee can inspect the invoice details and make a decision.
-
-The workflow does not continue until the approval decision is submitted.
-
-### 10. Approval Decision – IF
-
-The IF node checks the employee's decision.
-
-There are two possible outcomes:
-
-**APPROVE**
-
-If the invoice is approved, the workflow continues to the SAP submission step.
-
-**REJECT**
-
-If the invoice is rejected, it is not forwarded to the SAP submission step.
-
-This ensures that the approval decision controls the next action.
-
-### 11. SAP Sandbox Integration
-
-After approval, the invoice information is sent to a separate SAP sandbox workflow through an HTTP request.
-
-The sandbox receives the invoice information and simulates the acceptance and recording process.
-
-**Important:** This demonstration currently uses a simulation environment. It does not perform a real posting in a company's production SAP system.
-
-A production SAP integration would require authorized SAP access, suitable APIs, credentials, and company approval.
+If the invoice is rejected, the workflow follows a separate rejection path instead of continuing to the SAP submission step.
 
 ## 🛠️ Technologies Used
 
-- **n8n:** Workflow automation and orchestration
-- **PowerShell:** Sending test invoice files during development
-- **Webhooks:** Receiving invoice files and communicating between workflows
-- **JavaScript:** Data processing, normalization, and validation
-- **PDF / Excel / CSV:** Supported invoice document formats
-- **HTTP Request:** Communication with the SAP sandbox workflow
-- **SAP Sandbox:** Simulated invoice submission and acceptance
+- **n8n** – Workflow automation
+- **SAP Sandbox Simulation** – Demonstration of the SAP submission process
+- **Excel** – Invoice review and data preparation
+- **PDF Processing** – Invoice data extraction
+- **HTTP Webhooks** – File reception and communication
+- **JavaScript** – Data transformation and workflow logic
 
-## 🎯 Business Value
+## 💼 Business Value
 
-This project demonstrates how automation can support accounts payable and invoice processing activities.
+This automation demonstrates how businesses can:
 
-Potential benefits include:
+- Reduce repetitive manual invoice processing.
+- Improve invoice data consistency.
+- Automate document classification and data extraction.
+- Introduce human approval into automated processes.
+- Reduce manual data entry.
+- Prepare invoice information for ERP integration.
 
-- Reduced manual data entry
-- Faster invoice processing
-- Consistent invoice data structures
-- Early identification of missing or inconsistent information
-- Human control before submission
-- Improved process transparency
-- A foundation for future SAP integration
+## 🎯 Potential Use Cases
 
-## 💼 Use Cases
-
-This workflow can be adapted for:
+The workflow concept can be adapted for:
 
 - Accounts payable departments
 - Finance and accounting teams
 - Small and medium-sized businesses
-- Companies processing large numbers of invoices
-- Administrative departments
-- Automation and digital transformation projects
+- Invoice management processes
+- Administrative automation
+- ERP integration projects
 
 ## 🔐 Security and Project Availability
 
-This repository presents the project architecture and its main processing steps.
+This repository presents the project architecture and its capabilities.
 
-The complete production workflow JSON, API credentials, access tokens, passwords, and sensitive configuration details are not publicly distributed.
+To protect the workflow configuration and business logic:
 
-The demonstration uses fictitious invoice data.
+- The complete workflow JSON is not publicly shared.
+- API credentials and access tokens are not included.
+- Passwords and sensitive configuration details are excluded.
+- Demonstration invoice data are fictitious.
 
-## 📊 Project Status
+## 📌 Project Status
 
-- ✅ Invoice intake through n8n Webhook
-- ✅ Automatic file type identification
-- ✅ PDF extraction branch
-- ✅ XLSX extraction branch
-- ✅ XLS extraction branch
-- ✅ CSV extraction branch
-- ✅ Invoice field normalization
-- ✅ Invoice data validation
-- ✅ Excel review preparation
-- ✅ Human approval process
-- ✅ Approval and rejection routing
-- ✅ HTTP communication with SAP sandbox
-- ✅ SAP submission simulation tested
+**Status: Working Demonstration**
 
-## 🚀 Future Improvements
+The workflow has been developed and tested in an n8n environment.
 
-Potential future development includes:
+The SAP integration shown in the demonstration uses a simulated sandbox response. A connection to a live SAP system would require authorized access, appropriate API configuration, and company-specific integration settings.
 
-- Real SAP integration using authorized SAP APIs
-- Advanced invoice extraction using OCR and AI
-- Duplicate invoice detection
-- Additional document format support
-- Error handling and automated notifications
-- Invoice archiving and audit logging
-- Role-based approval processes
+## 🔮 Future Improvements
+
+Possible future developments include:
+
+- Integration with a live SAP environment.
+- Automated email notifications.
+- Advanced invoice validation.
+- Duplicate invoice detection.
+- Improved error handling and logging.
+- Additional document formats.
+- Extended approval processes.
 
 ## 👩‍💻 Author
 
-**Esther Madianga**
+**Esther Madianga**  
+Freelance Automation Specialist
 
-Freelance Automation Specialist | n8n & AI Automation
+AI Automation | n8n | Business Process Automation | IT Service Management
 
 **ConvergLeads – AI Automation. One Platform. Endless Possibilities.**
+
+---
+
+*This project is an automation demonstration developed to showcase practical business process automation with n8n.*
